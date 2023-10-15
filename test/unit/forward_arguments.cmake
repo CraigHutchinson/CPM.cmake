@@ -3,6 +3,18 @@ cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 include(${CPM_PATH}/CPM.cmake)
 include(${CPM_PATH}/testing.cmake)
 
+set(input "a;;b;c;;;;def;g;;")
+cpm_encode_empty_arguments("${input}" encoded)
+foreach(arg IN LISTS encoded)
+  assert_not_equal("${arg}" "")
+endforeach()
+assert_equal("${contains_empty_arg}" "")
+cpm_decode_empty_arguments("${encoded}" decoded)
+assert_equal("${decoded}" "${input}")
+
+# ignore source cache if set
+set(CPM_SOURCE_CACHE "")
+
 # Intercept underlying `FetchContent_Declare`
 function(FetchContent_Declare)
   set_property(GLOBAL PROPERTY last_FetchContent_Declare_ARGN "${ARGN}")
@@ -39,17 +51,16 @@ assert_equal(
 )
 
 # Intercept underlying `cpm_add_package_multi_arg`
-function(cpm_add_package_multi_arg)
-  set_property(GLOBAL PROPERTY last_cpm_add_package_multi_arg_ARGN "${ARGN}")
+function(CPMAddPackage)
+  set_property(GLOBAL PROPERTY last_cpmaddpackage_argn "${ARGN}")
 endfunction()
 
 # TEST: CPM Module file shall store all arguments including empty strings
 include(${CPM_MODULE_PATH}/Findfibonacci.cmake)
-get_property(
-  last_cpm_add_package_multi_arg_ARGN GLOBAL PROPERTY last_cpm_add_package_multi_arg_ARGN
-)
+
+get_property(last_cpmaddpackage_argn GLOBAL PROPERTY last_cpmaddpackage_argn)
 assert_equal(
-  "${last_cpm_add_package_multi_arg_ARGN}"
+  "${last_cpmaddpackage_argn}"
   "NAME;fibonacci;GIT_REPOSITORY;https://github.com/cpm-cmake/testpack-fibonacci.git;VERSION;1.2.3;EMPTY_OPTION;;COMMAND_WITH_EMPTY_ARG;foo;;bar"
 )
 
