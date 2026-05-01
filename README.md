@@ -240,6 +240,15 @@ This will not work for `find_package(CONFIG)` in CMake versions before 3.24.
 If set, CPM use additional directory level in cache to improve readability of packages names in IDEs like CLion. It changes cache structure, so all dependencies are downloaded again. There is no problem to mix both structures in one cache directory but then there may be 2 copies of some dependencies.
 This can also be set as an environmental variable.
 
+### CPM_ENABLE_ENV
+
+If set, CPM enables environment-based overrides for local development workflows.
+
+- `CPM_<dependency name>_SOURCE` can be read from the environment to apply local package overrides.
+- `get_cpm.cmake` can use `CPM_PATH` from the environment to select a local CPM script.
+
+When this option is not set, these environment-based overrides are ignored and only explicit CMake variables are used.
+
 ## Local package override
 
 Library developers are often in the situation where they work on a locally checked out dependency at the same time as on a consumer project.
@@ -248,6 +257,14 @@ For example, to use the local version of the dependency `Dep` at the path `/path
 
 ```bash
 cmake -Bbuild -DCPM_Dep_SOURCE=/path/to/dep
+```
+
+Environment-based local package overrides are also available when `CPM_ENABLE_ENV` is set.
+For example:
+
+```bash
+cmake -Bbuild -DCPM_ENABLE_ENV=ON
+export CPM_Dep_SOURCE=/path/to/dep
 ```
 
 ## Package lock

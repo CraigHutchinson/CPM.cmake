@@ -133,6 +133,7 @@ option(CPM_USE_NAMED_CACHE_DIRECTORIES
        "Use additional directory of package name in cache on the most nested level."
        $ENV{CPM_USE_NAMED_CACHE_DIRECTORIES}
 )
+option(CPM_ENABLE_ENV "Enable environment-based overrides for local package and CPM paths" OFF)
 
 set(CPM_VERSION
     ${CURRENT_CPM_VERSION}
@@ -764,6 +765,11 @@ function(CPMAddPackage)
   if(CPM_PACKAGE_ALREADY_ADDED)
     cpm_export_variables(${CPM_ARGS_NAME})
     return()
+  endif()
+
+  if(CPM_ENABLE_ENV AND NOT DEFINED CPM_${CPM_ARGS_NAME}_SOURCE AND DEFINED ENV{CPM_${CPM_ARGS_NAME}_SOURCE})
+    # Normalize separators to support Windows paths when reading from environment variables.
+    file(TO_CMAKE_PATH "$ENV{CPM_${CPM_ARGS_NAME}_SOURCE}" CPM_${CPM_ARGS_NAME}_SOURCE)
   endif()
 
   # Check for manual overrides
