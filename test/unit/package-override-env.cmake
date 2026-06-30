@@ -23,9 +23,7 @@ execute_process(
 assert_equal(${ret} "0")
 
 if(NOT "${cmake_stderr}" MATCHES "CPM:.*Dependency.*overridden by environment variable")
-  message(
-    FATAL_ERROR "Expected CPM ENV override warning not found in output:\n${cmake_stderr}"
-  )
+  message(FATAL_ERROR "Expected CPM ENV override warning not found in output:\n${cmake_stderr}")
 else()
   message(STATUS "test passed: CPM ENV override warning was emitted")
 endif()
