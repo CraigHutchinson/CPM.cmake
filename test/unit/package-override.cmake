@@ -12,9 +12,8 @@ configure_package_config_file(
 )
 
 execute_process(
-  COMMAND
-    ${CMAKE_COMMAND} "-S${CMAKE_CURRENT_LIST_DIR}/local_dependency" "-B${TEST_BUILD_DIR}"
-    "-DCPM_Dependency_SOURCE=${CMAKE_CURRENT_LIST_DIR}/local_dependency/dependency"
+  COMMAND ${CMAKE_COMMAND} "-S${CMAKE_CURRENT_LIST_DIR}/local_dependency" "-B${TEST_BUILD_DIR}"
+          "-DCPM_Dependency_SOURCE=${CMAKE_CURRENT_LIST_DIR}/local_dependency/dependency"
   RESULT_VARIABLE ret
   ERROR_VARIABLE cmake_stderr
 )
