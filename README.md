@@ -55,6 +55,13 @@ mkdir -p cmake
 wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake
 ```
 
+Or using PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force -Path "cmake"
+Invoke-WebRequest -Uri "https://github.com/cpm-cmake/CPM.cmake/releases/latest/download/get_cpm.cmake" -OutFile "cmake/CPM.cmake"
+```
+
 You can also download CPM.cmake directly from your project's `CMakeLists.txt`. See the [wiki](https://github.com/cpm-cmake/CPM.cmake/wiki/Downloading-CPM.cmake-in-CMake) for more details.
 
 ## Usage
@@ -69,7 +76,7 @@ CPMAddPackage(
   VERSION       # The minimum version of the dependency (optional, defaults to 0)
   PATCHES       # Patch files to be applied sequentially using patch and PATCH_OPTIONS (optional)
   OPTIONS       # Configuration options passed to the dependency (optional)
-  DOWNLOAD_ONLY # If set, the project is downloaded, but not configured (optional)
+  DOWNLOAD_ONLY # If set to YES, the project is downloaded, but not configured (optional, default NO)
   [...]         # Origin parameters forwarded to FetchContent_Declare, see below
 )
 ```
@@ -111,6 +118,9 @@ CPMAddPackage("https://example.com/my-package-1.2.3.zip#MD5=68e20f674a48be38d60e
 # An archive package from a given url. The version is explicitly given
 CPMAddPackage("https://example.com/my-package.zip@1.2.3")
 ```
+
+> **Supply chain security best practice:**
+> For maximum security and reproducibility, always prefer specifying immutable git commit hashes instead of tags or branches when referencing dependencies. Tags and branches can be changed or moved, but commit hashes always refer to the same code. You can specify a commit hash before the version in the URI, e.g. `gh:user/repo#<commit>@<version>`. This ensures your builds are protected from unexpected upstream changes or attacks.
 
 Additionally, if needed, extra arguments can be provided while using single argument syntax by using the shorthand syntax with the `URI` specifier.
 
@@ -547,7 +557,10 @@ CPMAddPackage(
 )
 ```
 
-URL_HASH is optional, but it's a good idea for releases.
+`URL_HASH` is optional, but it's a good idea for releases.
+
+> **Supply chain security best practice:**
+> When using source archives, always specify a hash (e.g., `SHA256`) with the `URL_HASH` option. This ensures the downloaded archive matches the expected content and helps prevent supply chain attacks. Never rely solely on URLs or tags for security.
 
 
 ### Identifying the URL
@@ -609,4 +622,10 @@ Example:
 The following snippet illustrates determining the SHA256 hash on a linux machine using `wget` and `sha256sum`:
 ```bash
 wget https://github.com/gabime/spdlog/archive/refs/tags/v1.13.0.zip -O - | sha256sum
+```
+
+The following snippet illustrates determining the SHA256 hash on a Windows machine using Powershell:
+
+```powershell
+Get-FileHash -InputStream ((Invoke-WebRequest 'https://github.com/gabime/spdlog/archive/refs/tags/v1.13.0.zip').RawContentStream)
 ```
